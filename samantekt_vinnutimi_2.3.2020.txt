@@ -1,0 +1,38 @@
+Vinnutími 2.3.2020 - Samantekt
+==============================
+
+Við sem gátum verið viðstödd í vinnutímanum áðan fórum í gegnum nokkur atriði tengd verkefnunum. Ég tek þau helstu sem við ræddum saman hér svo við séum öll á sömu síðunni með verkefnin. Verið svo óhrædd við að spyrja spurninga og líka taka þátt í að svara spurningum hvers annars á piazza. 
+
+* Top ports fyrir skanner. Það reyndist vera óþarfa flækjustig að láta ykkur sækja af wikipedia síðunni. Þið megið nota skránna port-list-top-50.txt sem viðmiðun fyrir ykkar sjálfgefna skann. Ég læt fylgja með skrá með mun fleiri portum til viðmiðunar. Upplýsingarnar sem þessir listar eru fengnir úr eru https://svn.nmap.org/nmap/nmap-services. 
+
+* scapy dæmið sem var vísað í (af pastebin) reyndist hafa einn galla sem er að skilgreining á timeout er nauðsynleg til að skanninn taki ekki alltof langan tíma. Ég læt fylgja skránna proto.py sem er lítillega endurbætt. Skoðið sérstaklega timeout gildið á kallinu í sr1. Þið þurfið að leika ykkur aðeins með það - þarf að vera stutt til að skanninn sé hraðvirkur en líka nógu langt til að eðlilegar tafir á línunni séu ekki túlkaðar sem lokað port.
+
+* SYN skann þarf að keyrast sem root. Til þess er best að nota sudo á Ubuntu vélinni ykkar en nauðsynlegt að nota rétt virtualenv. Ef þið eruð með virtualenv sem inniheldur scapy og annað nauðsynlegt í sömu möppu og scanner.py má kalla á með 
+
+    sudo VENV/bin/python scanner.py
+
+Með þessu er kallað með sudo réttindum á python túlkinn sem fylgir þessu virtualenv sem tryggir að það taki allar dependencies með sér, þ.e. þá python pakka sem þið höfðuð sett inn í ykkar virtualenv
+
+* Ég set inn smá dæmi um hvernig hægt er að nota ipaddress safnið til að smíða lista af IP tölum. Frjálst val er hvort er notað CIDR form eða svið í skannanum. Svið myndi vera lægsta IP tala - hæstu IP tölu, t.d. 10.0.20.10-10.0.20.40. Dæmið heitir iptest.py.
+
+* Lykilorðasöfnin sem þið eigið að brjóta með cracker eru öll mismunandi en þó með sömu tegundum lykilorða, þe. 20 einföld (beint úr lista þekktra), 10 með táknum (megið ganga út frá einni tölu eða tákni í enda þekkts lykilorðs), 10 með "leet" umbreytingum (skoðið lista í verkefnislýsingu), 10 stutt random (4-6 stafir) og 5 löng random (8-12 stafir). Umbreytingin fyrir leet sem var beitt á þekkt lykilorð úr safni var eftirfarandi:
+
+                pw = pw.replace("o","0")
+                pw = pw.replace("l","1")
+                pw = pw.replace("e","3")
+                pw = pw.replace("a","4")
+                pw = pw.replace("s","5")
+
+* Ef þið eruð í vafa um ferli við að brjóta lykilorð:
+
+Skoðið __crack_single fallið í cracker. Útfærslan sem þið fenguð notar __get_from_rainbow til að gera fyrstu tilraun. Hér þurfið þið að bæta við ykkar útfærslum af nýjum föllum til að brjóta með táknum, leet og random.
+
+Dæmi um ferli við að giska á lykilorð með tákni (sauðakóði):
+
+	1. veljum orð s úr lista
+	2. fyrir hvert tákn t smíðum st = s+t
+	3.   reiknum hakkasummu h = hash(st)
+	4.   berum saman h og hakkasummur í safni. 
+             Ef h passar við hakkasummu lykilorðs hs í safni er afkóðað gildi hs jafnt og st
+
+Notið hash_pw úr lib.hashfn til að reikna hakkasummuna (hash í dæminu að ofan). Það fall var notað til að kóða lykilorðin í söfnunum sem þið fenguð í hendur. Þar er líka að finna algoriþmann fyrir hvernig saltið er smíðað. Þið notið þessa algoriþma óbreytta vil að kóða ykkar ágiskanir, sbr að ofan.
